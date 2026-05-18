@@ -1,9 +1,24 @@
+// ============================================================
+// AuthPage.jsx — Página de inicio (Login / Registro)
+// ============================================================
+// Esta es la página pública (ruta "/") que ven los usuarios
+// que aún no han iniciado sesión. Contiene:
+//   - Un navbar con enlaces
+//   - Un hero con slideshow de imágenes de fondo
+//   - Un formulario de login o registro (alternables)
+//   - Sección "Sobre nosotros" con features
+//   - Formulario de contacto
+//   - Footer
+// ============================================================
+
 import { useState, useEffect } from 'react'
-import LoginForm from '../components/LoginForm'
-import RegisterForm from '../components/RegisterForm'
-import ContactForm from '../components/ContactForm'
+import LoginForm from '../components/LoginForm'       // Formulario de inicio de sesión
+import RegisterForm from '../components/RegisterForm' // Formulario de registro
+import ContactForm from '../components/ContactForm'   // Formulario de contacto (EmailJS)
 import styles from './AuthPage.module.css'
 
+// Array de slides para el carrusel de fondo del hero.
+// Cada slide tiene una URL de imagen (Unsplash) y un texto descriptivo.
 const SLIDES = [
   {
     url: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1600&q=80',
@@ -24,9 +39,15 @@ const SLIDES = [
 ]
 
 function AuthPage() {
+  // true = muestra LoginForm | false = muestra RegisterForm
   const [mostrarLogin, setMostrarLogin] = useState(true)
+  // Índice del slide actual del carrusel (0 al 3)
   const [slideActual, setSlideActual] = useState(0)
 
+  // useEffect: cuando el componente se monta, inicia un temporizador
+  // que cambia el slide cada 4.5 segundos automáticamente.
+  // El "return () => clearInterval(timer)" limpia el temporizador
+  // cuando el componente se desmonta (evita memory leaks).
   useEffect(() => {
     const timer = setInterval(() => {
       setSlideActual(prev => (prev + 1) % SLIDES.length)
@@ -37,17 +58,19 @@ function AuthPage() {
   return (
     <div className={styles.pagina}>
 
-      {/* NAVBAR */}
+      {/* ── NAVBAR ── */}
       <nav className={styles.navbar}>
         <span className={styles.navLogo}>✈ TravelApp</span>
         <div className={styles.navLinks}>
+          {/* Los href "#id" hacen scroll suave a la sección con ese id */}
           <a href="#sobre-nosotros" className={styles.navLink}>Sobre nosotros</a>
           <a href="#contacto" className={styles.navLink}>Contacto</a>
         </div>
       </nav>
 
-      {/* HERO fullscreen */}
+      {/* ── HERO con carrusel de imágenes ── */}
       <section className={styles.hero}>
+        {/* Renderiza todos los slides; solo el activo tiene la clase slideActivo */}
         {SLIDES.map((slide, i) => (
           <div
             key={i}
@@ -55,30 +78,34 @@ function AuthPage() {
             style={{ backgroundImage: `url(${slide.url})` }}
           />
         ))}
+        {/* Capa oscura semitransparente encima de la imagen */}
         <div className={styles.overlay} />
 
+        {/* Texto descriptivo del slide actual */}
         <p className={styles.slideCaption}>{SLIDES[slideActual].caption}</p>
 
+        {/* Puntos de navegación del carrusel (uno por slide) */}
         <div className={styles.slideDots}>
           {SLIDES.map((_, i) => (
             <button
               key={i}
               className={`${styles.dot} ${i === slideActual ? styles.dotActivo : ''}`}
-              onClick={() => setSlideActual(i)}
+              onClick={() => setSlideActual(i)} // Permite saltar a un slide al hacer clic
             />
           ))}
         </div>
 
-        {/* Login card flutuante */}
+        {/* Tarjeta flotante con el formulario de Login o Registro */}
         <div className={styles.loginCard}>
           {mostrarLogin
-            ? <LoginForm onSwitch={() => setMostrarLogin(false)} />
-            : <RegisterForm onSwitch={() => setMostrarLogin(true)} />
+            ? <LoginForm onSwitch={() => setMostrarLogin(false)} />   // Al registrarse → muestra RegisterForm
+            : <RegisterForm onSwitch={() => setMostrarLogin(true)} /> // Al volver → muestra LoginForm
           }
         </div>
       </section>
 
-      {/* SOBRE NOSOTROS */}
+      {/* ── SECCIÓN "SOBRE NOSOTROS" ── */}
+      {/* id="sobre-nosotros" permite que el link del navbar haga scroll aquí */}
       <section id="sobre-nosotros" className={styles.sobreNosotros}>
         <div className={styles.sobreContenido}>
           <span className={styles.badge}>¿Qué es TravelApp?</span>
@@ -88,6 +115,7 @@ function AuthPage() {
             Coordina itinerarios, comparte documentos, sugiere puntos de interés y vota con tu grupo —
             todo en un mismo lugar.
           </p>
+          {/* Grid de 4 características principales de la app */}
           <div className={styles.features}>
             <div className={styles.feature}>
               <div className={styles.featureIconWrap} style={{background:'#fff0ee'}}>
@@ -121,12 +149,12 @@ function AuthPage() {
         </div>
       </section>
 
-      {/* CONTACTO */}
+      {/* ── SECCIÓN DE CONTACTO ── */}
       <section id="contacto" className={styles.contactoSeccion}>
         <ContactForm />
       </section>
 
-      {/* FOOTER */}
+      {/* ── FOOTER ── */}
       <footer className={styles.footer}>
         <div className={styles.footerContenido}>
           <div className={styles.footerLogo}>✈ TravelApp</div>
