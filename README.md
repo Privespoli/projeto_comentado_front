@@ -1,9 +1,10 @@
-# travelapp_backend
 # ✈️ TravelApp
 
 > Aplicación web para la gestión de viajes en grupo. Organiza, comparte y planifica tus viajes con tus compañeros de aventura.
 
-![TravelApp](https://img.shields.io/badge/status-en%20desarrollo-green) ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js) ![React](https://img.shields.io/badge/React-Vite-61DAFB?logo=react) ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase)
+![TravelApp](https://img.shields.io/badge/status-producción-brightgreen) ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js) ![React](https://img.shields.io/badge/React-Vite-61DAFB?logo=react) ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase) ![Vercel](https://img.shields.io/badge/Frontend-Vercel-black?logo=vercel) ![Render](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render)
+
+🌐 **Demo en vivo:** [travelapp-frontend-pi.vercel.app](https://travelapp-frontend-pi.vercel.app)
 
 ---
 
@@ -11,12 +12,14 @@
 
 - [Sobre el proyecto](#sobre-el-proyecto)
 - [Funcionalidades](#funcionalidades)
+- [Permisos por rol](#permisos-por-rol)
 - [Stack tecnológico](#stack-tecnológico)
 - [Arquitectura](#arquitectura)
 - [Instalación](#instalación)
 - [Variables de entorno](#variables-de-entorno)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Base de datos](#base-de-datos)
+- [Deploy](#deploy)
 - [Equipo](#equipo)
 
 ---
@@ -33,6 +36,7 @@ TravelApp es una aplicación fullstack desarrollada como proyecto final de bootc
 - Registro e inicio de sesión con email y contraseña (Supabase Auth)
 - Rutas protegidas — solo usuarios autenticados acceden al dashboard
 - Cierre de sesión
+- Interceptor de respuesta — redirige al login automáticamente si el token expira (401)
 
 ### Dashboard
 - Vista de todos los viajes donde el usuario es **titular** o **integrante**
@@ -48,11 +52,34 @@ TravelApp es una aplicación fullstack desarrollada como proyecto final de bootc
 
 ### Perfil de usuario
 - Foto de perfil, nombre y teléfono
-- El nombre se muestra en el header del dashboard y en la lista de integrantes
+- El nombre se muestra en el header del dashboard y en la lista de integrantes de cada viaje
 
 ### Formulario de contacto
 - Integrado en la landing page
 - Envío de emails via EmailJS sin necesidad de backend
+
+---
+
+## 🔑 Permisos por rol
+
+| Acción | Titular | Integrante |
+|--------|---------|------------|
+| Ver viajes en el dashboard | ✅ | ✅ |
+| Crear viaje | ✅ | ❌ |
+| Cambiar estado del viaje | ✅ | ❌ |
+| Ver integrantes | ✅ | ✅ |
+| Añadir integrantes | ✅ | ❌ |
+| Eliminar integrantes | ✅ | ❌ |
+| Ver tickets y documentos | ✅ | ✅ |
+| Subir tickets y documentos | ✅ | ✅ |
+| Eliminar tickets y documentos | ✅ | ❌ |
+| Ver itinerario | ✅ | ✅ |
+| Gestionar itinerario | ✅ | ❌ |
+| Ver mapa y POI | ✅ | ✅ |
+| Añadir puntos de interés | ✅ | ✅ |
+| Votar puntos de interés | ✅ | ✅ |
+| Eliminar puntos de interés | ✅ | ❌ |
+| Editar perfil propio | ✅ | ✅ |
 
 ---
 
@@ -66,6 +93,8 @@ TravelApp es una aplicación fullstack desarrollada como proyecto final de bootc
 | Autenticación | Supabase Auth |
 | Storage | Supabase Storage |
 | Email | EmailJS |
+| Deploy frontend | Vercel |
+| Deploy backend | Render |
 | Control de versiones | Git + GitHub |
 
 ---
@@ -73,9 +102,9 @@ TravelApp es una aplicación fullstack desarrollada como proyecto final de bootc
 ## 🏗️ Arquitectura
 
 ```
-Cliente (React + Vite)
+Cliente (React + Vite) — Vercel
         ↓ HTTP requests con JWT
-Servidor (Node.js + Express)
+Servidor (Node.js + Express) — Render
         ↓ supabaseAdmin (service key)
 Supabase (PostgreSQL + Storage + Auth)
 ```
@@ -94,31 +123,19 @@ El backend actúa como intermediario entre el frontend y Supabase, usando la **s
 ### Backend
 
 ```bash
-# Clonar el repositorio
 git clone https://github.com/melinarivera/travelapp_backend.git
 cd travelapp_backend
-
-# Instalar dependencias
 npm install
-
-# Crear archivo .env (ver sección de variables de entorno)
 cp .env.example .env
-
-# Arrancar en desarrollo
 npm run dev
 ```
 
 ### Frontend
 
 ```bash
-# Clonar el repositorio
 git clone https://github.com/melinarivera/travelapp_frontend.git
 cd travelapp_frontend
-
-# Instalar dependencias
 npm install
-
-# Arrancar en desarrollo
 npm run dev
 ```
 
@@ -137,7 +154,7 @@ PORT=3000
 
 ### Frontend
 
-Las credenciales de EmailJS están configuradas directamente en el componente `ContactForm.jsx`.
+Las credenciales de EmailJS están configuradas en el componente `ContactForm.jsx`.
 
 ---
 
@@ -153,13 +170,17 @@ travelapp_backend/
     │   ├── viajesController.js
     │   ├── integrantesController.js
     │   ├── documentosController.js
-    │   └── perfilController.js
+    │   ├── perfilController.js
+    │   ├── itinerarioController.js
+    │   └── poiController.js
     ├── routes/
     │   ├── authRoutes.js
     │   ├── viajesRoutes.js
     │   ├── integrantesRoutes.js
     │   ├── documentosRoutes.js
-    │   └── perfilRoutes.js
+    │   ├── perfilRoutes.js
+    │   ├── itinerarioRoutes.js
+    │   └── poiRoutes.js
     ├── middleware/
     │   ├── authMiddleware.js
     │   └── uploadMiddleware.js
@@ -183,7 +204,9 @@ travelapp_frontend/
     │   ├── Integrantes.jsx
     │   ├── TicketsYDocs.jsx
     │   ├── Perfil.jsx
-    │   └── ContactForm.jsx
+    │   ├── ContactForm.jsx
+    │   ├── Itinerario.jsx
+    │   └── MapaPOI.jsx
     ├── context/
     │   └── AuthContext.jsx
     └── api.js
@@ -213,32 +236,45 @@ travelapp_frontend/
 | `documentos` | PDFs e imágenes de tickets |
 | `avatares` | Fotos de perfil de usuarios |
 
+### Seguridad
+
+Todas las tablas tienen **Row Level Security (RLS)** activado en Supabase. El backend usa la `service_role key` a través de `supabaseAdmin` para saltarse las políticas RLS y garantizar el control de acceso desde el servidor.
+
+---
+
+## 🌐 Deploy
+
+| Servicio | Plataforma | URL |
+|---------|-----------|-----|
+| Frontend | Vercel | [travelapp-frontend-pi.vercel.app](https://travelapp-frontend-pi.vercel.app) |
+| Backend | Render | [travelapp-backend-61b8.onrender.com](https://travelapp-backend-61b8.onrender.com) |
+
+> **Nota:** El backend usa el plan gratuito de Render, que se "duerme" tras 15 minutos de inactividad. El primer request puede tardar ~50 segundos en responder.
+
 ---
 
 ## 👩‍💻 Equipo
 
-| Desarrolladoras | Áreas |
+| Desarrolladora | Áreas |
 |---------------|-------|
-| **Melina Rivera** | Backend, autenticación, login, dashboard, integrantes, tickets & docs, perfil, formulario de contacto, Base de Datos |
-| **Priscila Nunes** | Backend, Base de Datos, registro, Itinerario, mapa & POI, puntos de interés con votación, diseño visual, cursor y paleta de colores |
+| **Melina Rivera** | Backend (auth, viajes, integrantes, documentos, perfil), frontend (dashboard, tickets & docs, perfil, contacto), base de datos, interceptores HTTP, deploy |
+| **Priscila Nunes** | Backend (registro, itinerario, mapa & POI, votación), frontend (itinerario, mapa & POI), diseño visual, paleta de colores, cursor personalizado |
 
 ---
 
 ## 📄 Licencia
 
-Proyecto académico — Bootcamp 2026.
-
-### © 2026 Melina Rivera & Priscila Nunes. Todos los derechos reservados.
+### © 2026 Priscila Nunes & Melina Rivera. Todos los derechos reservados.
 
 Este proyecto es **software propietario**. El código fuente se comparte públicamente con fines de **exhibición y portfolio personal** únicamente.
 
 **Queda estrictamente prohibido**, sin autorización escrita y expresa de las autoras:
 
-* Clonar, copiar o descargar este repositorio con fines distintos a la visualización.
-* Distribuir, sublicenciar o vender el código, en su totalidad o en parte.
-* Usar este proyecto como base para otros proyectos, ya sean personales o comerciales.
-* Modificar, descompilar o crear obras derivadas a partir de este código.
+- Clonar, copiar o descargar este repositorio con fines distintos a la visualización.
+- Distribuir, sublicensiar o vender el código, en su totalidad o en parte.
+- Usar este proyecto como base para otros proyectos, ya sean personales o comerciales.
+- Modificar, descompilar o crear obras derivadas a partir de este código.
 
-Para solicitar permisos de uso, colaboración o cualquier consulta relacionada, puedes contactarnos a través de GitHub: [@melinarivera](https://github.com/melinarivera) o [@Privespoli](https://github.com/Privespoli).
+Para solicitar permisos de uso o colaboración: [@melinarivera](https://github.com/melinarivera) · [@Privespoli](https://github.com/Privespoli)
 
 > El hecho de que este repositorio sea público **no implica** que se otorgue ningún tipo de licencia de uso, copia o distribución.
